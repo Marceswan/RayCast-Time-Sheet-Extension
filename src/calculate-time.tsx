@@ -168,7 +168,7 @@ export default function CalculateTime() {
             title="Clear All"
             icon={Icon.Trash}
             onAction={handleClear}
-            shortcut={{ modifiers: ["cmd"], key: "k" }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "delete" }}
           />
           <Action
             title="Add More Lines"

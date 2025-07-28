@@ -13,7 +13,7 @@ A beautiful and efficient time calculator extension for Raycast that allows you 
 - 📊 **Dual Display**: Shows total in both time and decimal formats
 - ⌨️ **Keyboard Shortcuts**:
   - `⌘+C` - Copy total to clipboard
-  - `⌘+K` - Clear all entries
+  - `⌘+Shift+Delete` - Clear all entries
   - `⌘+N` - Add more lines
 - 🌈 **Beautiful Icons**: Custom rainbow-themed icons for both light and dark modes
 - ✅ **Smart Validation**: Helpful error messages for invalid inputs
