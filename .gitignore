@@ -31,3 +31,5 @@ CREATE_ICON.md
 ICON_GUIDE.md
 COMPLIANCE_REPORT.md
 NEXT_STEPS.md
+push-to-github.sh
+github-setup.sh
