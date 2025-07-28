@@ -8,7 +8,6 @@ import {
   Icon,
 } from "@raycast/api";
 import { useState, useMemo } from "react";
-import { nanoid } from "@raycast/utils";
 
 interface TimeEntry {
   id: string;
@@ -20,8 +19,8 @@ interface TimeEntry {
 
 // Create initial empty entries
 const createEmptyEntries = (count: number): TimeEntry[] => {
-  return Array.from({ length: count }, () => ({
-    id: nanoid(),
+  return Array.from({ length: count }, (_, index) => ({
+    id: `entry-${Date.now()}-${index}`,
     value: "",
     minutes: null,
     isValid: true,
