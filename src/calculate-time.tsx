@@ -7,7 +7,7 @@ import {
   Clipboard,
   Icon,
 } from "@raycast/api";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 
 interface TimeEntry {
   id: string;
@@ -30,6 +30,17 @@ const createEmptyEntries = (count: number): TimeEntry[] => {
 export default function CalculateTime() {
   const [entries, setEntries] = useState<TimeEntry[]>(createEmptyEntries(10));
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedFieldId, setFocusedFieldId] = useState<string | null>(null);
+
+  // Reset focus after a delay
+  useEffect(() => {
+    if (focusedFieldId) {
+      const timer = setTimeout(() => {
+        setFocusedFieldId(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [focusedFieldId]);
 
   // Parse time input and return minutes
   const parseTimeInput = (input: string): { minutes: number | null; isValid: boolean; errorMessage?: string } => {
@@ -89,6 +100,67 @@ export default function CalculateTime() {
 
   // Handle input change
   const handleInputChange = (id: string, value: string) => {
+    // Check if input is 4 digits (e.g., "0300", "1430")
+    const fourDigitPattern = /^(\d{4})$/;
+    const match = value.match(fourDigitPattern);
+    
+    if (match) {
+      // Auto-format to HH:MM
+      const digits = match[1];
+      const hours = digits.substring(0, 2);
+      const minutes = digits.substring(2, 4);
+      const formattedValue = `${hours}:${minutes}`;
+      
+      // Update the current entry
+      setEntries((prev) => {
+        const currentIndex = prev.findIndex(e => e.id === id);
+        const isLastEntry = currentIndex === prev.length - 1;
+        
+        // If this is the last entry and it's not empty, add a new row
+        if (isLastEntry && value.trim()) {
+          const newEntries = [...prev, ...createEmptyEntries(1)];
+          return newEntries.map((entry, index) => {
+            if (entry.id !== id) return entry;
+            
+            const parsed = parseTimeInput(formattedValue);
+            return {
+              ...entry,
+              value: formattedValue,
+              minutes: parsed.minutes,
+              isValid: parsed.isValid,
+              errorMessage: parsed.errorMessage,
+            };
+          });
+        }
+        
+        return prev.map((entry) => {
+          if (entry.id !== id) return entry;
+          
+          const parsed = parseTimeInput(formattedValue);
+          return {
+            ...entry,
+            value: formattedValue,
+            minutes: parsed.minutes,
+            isValid: parsed.isValid,
+            errorMessage: parsed.errorMessage,
+          };
+        });
+      });
+      
+      // Set focus to the next field
+      setEntries((prev) => {
+        const currentIndex = prev.findIndex(e => e.id === id);
+        if (currentIndex < prev.length - 1) {
+          const nextId = prev[currentIndex + 1].id;
+          setFocusedFieldId(nextId);
+        }
+        return prev;
+      });
+      
+      return;
+    }
+    
+    // Normal update for non-4-digit inputs
     setEntries((prev) =>
       prev.map((entry) => {
         if (entry.id !== id) return entry;
@@ -184,6 +256,10 @@ export default function CalculateTime() {
         text={`${formatTimeDisplay(totalMinutes)} (${formatDecimalDisplay(totalMinutes)} hours)`}
       />
       
+      <Form.Description
+        text="💡 Tip: Type 4 digits (e.g., 0830) to auto-format to HH:MM and jump to next line"
+      />
+      
       <Form.Separator />
       
       {entries.map((entry, index) => (
@@ -191,11 +267,13 @@ export default function CalculateTime() {
           key={entry.id}
           id={entry.id}
           title={`Entry ${index + 1}`}
-          placeholder="e.g., 8:30 or 8.5"
+          placeholder="e.g., 8:30 or 8.5 or 0830"
           value={entry.value}
           error={entry.isValid ? undefined : entry.errorMessage}
           onChange={(value) => handleInputChange(entry.id, value)}
           storeValue={false}
+          autoFocus={focusedFieldId === entry.id || (index === 0 && !focusedFieldId)}
+          onFocus={() => setFocusedFieldId(entry.id)}
         />
       ))}
     </Form>

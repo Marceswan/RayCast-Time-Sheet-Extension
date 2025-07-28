@@ -3,7 +3,7 @@
   "name": "time-calculator",
   "title": "Time Calculator",
   "description": "Calculate total hours from multiple time entries supporting both HH:MM and decimal formats",
-  "icon": "icon.png",
+  "icon": "assets/icon.png",
   "author": "marcswan",
   "categories": [
     "Productivity"
