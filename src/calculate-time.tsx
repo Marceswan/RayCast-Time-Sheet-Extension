@@ -1,13 +1,5 @@
-import {
-  Form,
-  ActionPanel,
-  Action,
-  showToast,
-  Toast,
-  Clipboard,
-  Icon,
-} from "@raycast/api";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { Form, ActionPanel, Action, showToast, Toast, Clipboard, Icon } from "@raycast/api";
+import { useState, useMemo, useEffect } from "react";
 
 interface TimeEntry {
   id: string;
@@ -29,7 +21,6 @@ const createEmptyEntries = (count: number): TimeEntry[] => {
 
 export default function CalculateTime() {
   const [entries, setEntries] = useState<TimeEntry[]>(createEmptyEntries(10));
-  const [isLoading, setIsLoading] = useState(false);
   const [focusedFieldId, setFocusedFieldId] = useState<string | null>(null);
 
   // Reset focus after a delay
@@ -103,25 +94,25 @@ export default function CalculateTime() {
     // Check if input is 4 digits (e.g., "0300", "1430")
     const fourDigitPattern = /^(\d{4})$/;
     const match = value.match(fourDigitPattern);
-    
+
     if (match) {
       // Auto-format to HH:MM
       const digits = match[1];
       const hours = digits.substring(0, 2);
       const minutes = digits.substring(2, 4);
       const formattedValue = `${hours}:${minutes}`;
-      
+
       // Update the current entry
       setEntries((prev) => {
-        const currentIndex = prev.findIndex(e => e.id === id);
+        const currentIndex = prev.findIndex((e) => e.id === id);
         const isLastEntry = currentIndex === prev.length - 1;
-        
+
         // If this is the last entry and it's not empty, add a new row
         if (isLastEntry && value.trim()) {
           const newEntries = [...prev, ...createEmptyEntries(1)];
-          return newEntries.map((entry, index) => {
+          return newEntries.map((entry) => {
             if (entry.id !== id) return entry;
-            
+
             const parsed = parseTimeInput(formattedValue);
             return {
               ...entry,
@@ -132,10 +123,10 @@ export default function CalculateTime() {
             };
           });
         }
-        
+
         return prev.map((entry) => {
           if (entry.id !== id) return entry;
-          
+
           const parsed = parseTimeInput(formattedValue);
           return {
             ...entry,
@@ -146,25 +137,25 @@ export default function CalculateTime() {
           };
         });
       });
-      
+
       // Set focus to the next field
       setEntries((prev) => {
-        const currentIndex = prev.findIndex(e => e.id === id);
+        const currentIndex = prev.findIndex((e) => e.id === id);
         if (currentIndex < prev.length - 1) {
           const nextId = prev[currentIndex + 1].id;
           setFocusedFieldId(nextId);
         }
         return prev;
       });
-      
+
       return;
     }
-    
+
     // Normal update for non-4-digit inputs
     setEntries((prev) =>
       prev.map((entry) => {
         if (entry.id !== id) return entry;
-        
+
         const parsed = parseTimeInput(value);
         return {
           ...entry,
@@ -208,7 +199,7 @@ export default function CalculateTime() {
       const timeFormat = formatTimeDisplay(totalMinutes);
       const decimalFormat = formatDecimalDisplay(totalMinutes);
       const clipboardContent = `Total: ${timeFormat} (${decimalFormat} hours)`;
-      
+
       await Clipboard.copy(clipboardContent);
       await showToast({
         style: Toast.Style.Success,
@@ -226,7 +217,6 @@ export default function CalculateTime() {
 
   return (
     <Form
-      isLoading={isLoading}
       navigationTitle="Time Calculator"
       actions={
         <ActionPanel>
@@ -255,13 +245,11 @@ export default function CalculateTime() {
         title="Total Time"
         text={`${formatTimeDisplay(totalMinutes)} (${formatDecimalDisplay(totalMinutes)} hours)`}
       />
-      
-      <Form.Description
-        text="💡 Tip: Type 4 digits (e.g., 0830) to auto-format to HH:MM and jump to next line"
-      />
-      
+
+      <Form.Description text="💡 Tip: Type 4 digits (e.g., 0830) to auto-format to HH:MM and jump to next line" />
+
       <Form.Separator />
-      
+
       {entries.map((entry, index) => (
         <Form.TextField
           key={entry.id}

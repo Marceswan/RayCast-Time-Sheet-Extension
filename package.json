@@ -1,10 +1,10 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "time-calculator",
-  "title": "Time Calculator",
+  "title": "Time Addition Calculator",
+  "author": "marc.cinema",
   "description": "Calculate total hours from multiple time entries supporting both HH:MM and decimal formats",
-  "icon": "assets/icon.png",
-  "author": "marcswan",
+  "icon": "icon.png",
   "categories": [
     "Productivity"
   ],
